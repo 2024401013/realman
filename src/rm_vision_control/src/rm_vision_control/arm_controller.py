@@ -5,7 +5,7 @@ import rospy
 import numpy as np
 from geometry_msgs.msg import Pose, Quaternion
 from rm_msgs.msg import MoveJ, MoveJ_P, MoveL, Plan_State, Arm_Current_State, GetArmState_Command
-from std_msgs.msg import Int32, Float32
+from std_msgs.msg import Int32, Float32, Empty
 
 class ArmController:
     def __init__(self):
@@ -57,6 +57,8 @@ class ArmController:
         self.arm_state_timer = None  # 用于定时发布
         self.get_state_pub = rospy.Publisher('/rm_driver/GetArmState_Cmd', 
                                            GetArmState_Command, queue_size=10)
+        self.emergency_stop_pub = rospy.Publisher('/rm_driver/Emergency_Stop', Empty, queue_size=5)
+        self.clear_err_pub = rospy.Publisher('/rm_driver/Clear_System_Err', Empty, queue_size=5)                                  
 
         # 订阅者
         rospy.Subscriber('/rm_driver/Plan_State', Plan_State, self.plan_state_callback)
@@ -73,6 +75,20 @@ class ArmController:
         self.start_arm_state_publishing()
         
         rospy.loginfo("ArmController initialized")
+    
+    def emergency_stop(self):
+        """触发紧急停止：发布 Empty 消息，让臂刹车停在当前位置"""
+        msg = Empty()
+        self.emergency_stop_pub.publish(msg)
+        rospy.logwarn("Emergency Stop triggered! Arm should brake immediately.")
+        rospy.sleep(0.8)  # 等待刹车生效（可调 0.5~1.5s）
+
+    def clear_error(self):
+        """清系统错误：发布 Empty 消息"""
+        msg = Empty()
+        self.clear_err_pub.publish(msg)
+        rospy.loginfo("Cleared system error.")
+        rospy.sleep(0.5)
 
     def arm_state_callback(self, msg):
         """机械臂状态回调 - 存储位置和姿态信息"""

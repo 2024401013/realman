@@ -5,7 +5,7 @@ import rospy
 import signal
 import sys
 import threading  
-from std_msgs.msg import Int32  
+from std_msgs.msg import Int32, String
 from rm_vision_control.arm_controller import ArmController
 from rm_vision_control.vision_detector import VisionDetector
 from rm_vision_control.crack_detection import CrackDetectionTask
@@ -14,33 +14,58 @@ from rm_vision_control.point_inspection import PointInspectionTask
 class MainController:
     def __init__(self):
         rospy.init_node('main_controller', anonymous=True)
-        
-        # 初始化模块
+       
+        # 初始化模組
         rospy.loginfo("Initializing modules...")
         self.task_lock = threading.Lock()
-        
+       
         self.arm_controller = ArmController()
         self.vision_detector = VisionDetector()
-        
-        # 添加小车指令订阅
+       
+        # 添加小車指令訂閱
         rospy.Subscriber('/is_arrive', Int32, self.car_command_callback)
-        
-        # 初始化任务
+       
+        # 初始化任務
         self.crack_task = CrackDetectionTask(self.arm_controller, self.vision_detector)
         self.point_task = PointInspectionTask(self.arm_controller, self.vision_detector)
-        
-        # 修改状态变量
-        self.active_task = None  # 'crack' 或 'point'
-        self.point_task_count = 0  # 记录16点检测执行次数（0, 1, 2）
-        
-        # 设置信号处理
+       
+        # 修改狀態變數
+        self.active_task = None # 'crack' 或 'point'
+        self.point_task_count = 0 # 記錄16點檢測執行次數（0, 1, 2）
+       
+        # 新增：訂閱 point 任務結束信號
+        rospy.Subscriber('/point_task_done', String, self._on_point_task_done)
+       
+        # 設置信號處理
         signal.signal(signal.SIGINT, self.signal_handler)
-        
+       
         rospy.loginfo("Main Controller initialized successfully")
         rospy.loginfo("Waiting for car commands...")
-        rospy.loginfo("  is_arrive=1: Start crack detection")
-        rospy.loginfo("  is_arrive=2: Stop crack detection OR start second point inspection")
-        rospy.loginfo("  is_arrive=3: Starsst first 16-point inspection")
+        rospy.loginfo(" is_arrive=1: Start crack detection")
+        rospy.loginfo(" is_arrive=2: Stop crack detection OR start second point inspection")
+        rospy.loginfo(" is_arrive=3: Start first 16-point inspection")
+
+    def _on_point_task_done(self, msg):
+            with self.task_lock:
+                if self.active_task == 'point':
+                    rospy.loginfo(f"Received point task done signal: {msg.data} → clearing active_task")
+                    
+                    # 判斷是否為第二輪
+                    if self.point_task_count == 2:
+                        self.arm_controller.set_arm_state(0)
+                        rospy.loginfo("Second point task completed → arm_state set to 0")
+                    else:
+                        rospy.loginfo("First point task completed → keeping arm_state=1")
+                    
+                    self.active_task = None
+                    
+                    # 強制確認回家
+                    if self.arm_controller.wait_until_home(timeout=30.0):
+                        rospy.loginfo("Arm confirmed at home after point task")
+                    else:
+                        rospy.logwarn("Arm home check timeout after point task")
+                else:
+                    rospy.logdebug("Received point task done but no active point task")
 
     def car_command_callback(self, msg):
             """处理小车指令 /is_arrive"""
@@ -85,8 +110,11 @@ class MainController:
                     if self.active_task == 'crack':
                         rospy.loginfo("=" * 60)
                         rospy.loginfo("Received command 2: Stop crack detection")
+
+                        self.arm_controller.emergency_stop()
                         self.crack_task.is_active = False
                         rospy.sleep(0.5)
+                        self.arm_controller.clear_error()
                         
                         rospy.loginfo("Waiting for arm to physically return home...")
                         if self.arm_controller.wait_until_home(timeout=60.0):
@@ -110,8 +138,8 @@ class MainController:
                         self.point_task_count = 2
                         self.point_task.current_count = 2
                         
-                        self.arm_controller.set_arm_state(1)
-                        rospy.loginfo("Arm state set to 1")
+                        self.arm_controller.set_arm_state(1)  # 設為工作中
+                        rospy.loginfo("Arm state set to 1 for second point task")
                         rospy.sleep(1.0)
                         self.arm_controller.set_car_speed(0.0)
                         rospy.loginfo("Car speed set to 0.0")
@@ -120,6 +148,7 @@ class MainController:
                         task_thread = threading.Thread(target=self.point_task.execute_task, daemon=True)
                         task_thread.start()
                         rospy.loginfo("Second point inspection task thread started")
+                    
                     else:
                         rospy.logwarn(f"Cannot process command 2: active_task={self.active_task}, point_count={self.point_task_count}")
 

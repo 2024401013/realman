@@ -49,6 +49,7 @@ class VisionDetector:
         self.crack_model = None
         self.target_model = None
         self.load_models()
+        self.warmup_models()
         
         # ==== 图像订阅 ====
         self.color_image = None
@@ -77,6 +78,28 @@ class VisionDetector:
         )
 
         rospy.loginfo("VisionDetector initialized.")
+
+    def warmup_models(self):
+        """在启动时对两个模型各跑一次 dummy 推理，消除首次延迟"""
+        if self.crack_model is not None:
+            rospy.loginfo("Warm-up crack model...")
+            dummy_img = np.zeros((640, 640, 3), dtype=np.uint8)  # 随便一张黑图，大小匹配模型输入
+            try:
+                _ = self.crack_model(dummy_img, conf=0.4, verbose=False)
+                rospy.loginfo("Crack model warm-up completed")
+            except Exception as e:
+                rospy.logwarn(f"Crack model warm-up failed: {e}")
+
+        if self.target_model is not None:
+            rospy.loginfo("Warm-up target model...")
+            dummy_img = np.zeros((640, 640, 3), dtype=np.uint8)
+            try:
+                _ = self.target_model(dummy_img, conf=0.3, verbose=False)
+                rospy.loginfo("Target model warm-up completed")
+            except Exception as e:
+                rospy.logwarn(f"Target model warm-up failed: {e}")
+
+        rospy.loginfo("All models warmed up. Ready for fast inference.")
 
     def load_models(self):
         """加载 TensorRT engine 模型"""

@@ -25,7 +25,7 @@ class CrackDetectionTask:
         self.is_active = True
         try:
             # 发布小车缓慢速度
-            self.arm_controller.set_arm_state(1)
+            self.arm.set_arm_state(1)
             rospy.loginfo("Arm state set to 1")
             rospy.sleep(0.5)
             self.arm.set_car_speed(0.3)
@@ -43,6 +43,12 @@ class CrackDetectionTask:
         except Exception as e:
             rospy.logerr(f"Error in crack detection task: {e}")
         finally:
+            if self.is_active:
+                self.arm.emergency_stop()
+                rospy.sleep(0.5)  # 等待刹车稳定
+
+            self.arm.clear_error()
+
             # 关键：确保回到home
             rospy.loginfo("Task completed or stopped, returning home")
             self.arm.go_home()

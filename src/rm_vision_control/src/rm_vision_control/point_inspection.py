@@ -24,19 +24,19 @@ class PointInspectionTask:
         self.current_count = 0
         
         rospy.loginfo("PointInspectionTask initialized")
-    
+
     def execute_task(self):
-        """执行16点检测任务"""
+        """執行16點檢測任務"""
         try:
-            # 停止小车
+            # 停止小車
             self.arm.set_car_speed(0.0)
             rospy.loginfo("Car stopped")
-           
-            # 移动到观测位置
+          
+            # 移動到观测位置
             if not self.arm.move_to_pose_jp(self.arm.detect_pose, speed=0.2):
                 rospy.logerr("Failed to move to detect pose")
                 return
-           
+          
             rospy.loginfo("Detecting target for up to 10 seconds...")
             start_time = rospy.Time.now()
             target_center = None
@@ -45,69 +45,81 @@ class PointInspectionTask:
                 if target_center is None:
                     rospy.loginfo("Target not detected yet, retrying...")
                     rospy.sleep(0.5)
-           
+          
             if target_center is None:
                 rospy.logwarn("Target not detected after 10 seconds, task failed")
                 rospy.loginfo("Returning to home position due to detection failure")
                 self.arm.go_home()
-                
-                # 失败也要恢复状态
-                if self.current_count == 2:
-                    self.arm.set_arm_state(0)
-                    rospy.loginfo("Failed second point → arm_state → 0")
-                rospy.sleep(0.5)
+               
+                # 失敗也要恢復狀態
                 self.arm.set_car_speed(0.8)
                 rospy.loginfo("Failed detection → car speed restored to 0.8")
-                
+               
                 self.is_active = False
-                return   
-           
+                # 新增：即使失敗也要通知主控制器任務結束
+                self._publish_task_done("failed")
+                return
+          
             rospy.loginfo(f"Target center detected at: {target_center}")
-           
-            # 计算16个点的坐标
+          
+            # 計算16個點的坐標
             points = self.vision.calculate_16_points(
                 target_center['center_3d_robot'],
                 grid_size=self.grid_size,
                 rows=self.rows,
                 cols=self.cols
             )
-           
+          
             rospy.loginfo(f"Calculated {len(points)} points")
-           
-            # 执行16点检测
+          
+            # 執行16點檢測
             self.execute_point_inspection(points)
-           
+          
             # 回到初始位置
             rospy.loginfo("Returning to home position")
             self.arm.go_home()
-           
+          
             rospy.loginfo("16-point inspection task completed successfully")
-           
+          
+            # 成功結束也要通知
+            self._publish_task_done("completed")
+          
         except Exception as e:
             rospy.logerr(f"Error in 16-point inspection task: {e}")
-        
+            # 異常也要通知
+            self._publish_task_done("error")
+       
         finally:
             rospy.loginfo("Point task cleanup: ensuring return to home and restore car speed")
-           
+          
             self.arm.go_home()
-           
+          
             # 等待回家
             if self.arm.wait_until_home(timeout=60.0):
                 rospy.loginfo("Arm reached home during cleanup")
             else:
                 rospy.logwarn("Home timeout in cleanup, proceeding anyway")
-           
-            if self.current_count == 2:
-                self.arm.set_arm_state(0)
-                rospy.loginfo("Second point task cleanup: arm_state set to 0 (first)")
-            else:
-                rospy.loginfo("Point task cleanup: keeping arm_state=1 (first run)")
-            rospy.sleep(0.5)
+          
             self.arm.set_car_speed(0.8)
             rospy.loginfo("Point task cleanup: car speed restored to 0.8 (after arm_state)")
-           
+          
             self.is_active = False
             rospy.loginfo("Point inspection task thread completed - is_active=False")
+            
+            # 最後保險：無論如何都發送結束信號
+            self._publish_task_done("finally")
+
+    # 新增一個私有方法，統一發布結束信號
+    def _publish_task_done(self, status="done"):
+        from std_msgs.msg import String
+        try:
+            pub = rospy.Publisher('/point_task_done', String, queue_size=1, latch=True)
+            msg = String()
+            msg.data = f"point_task_{status}_{self.current_count}"
+            pub.publish(msg)
+            rospy.loginfo(f"Published point task done signal: {msg.data}")
+        except Exception as e:
+            rospy.logwarn(f"Failed to publish point task done: {e}")
 
     def execute_point_inspection(self, points):
         """执行点检测"""

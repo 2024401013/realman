@@ -22,7 +22,7 @@ class VisionDetector:
         self.bridge = CvBridge()
         
         # ==== 模型路径 ====
-        self.crack_model_path = '/home/nvidia/rm_robot/src/rm_vision_control/models/crack_model.engine'
+        self.crack_model_path = '/home/nvidia/rm_robot/src/rm_vision_control/models/crack_best.engine'
         self.target_model_path = '/home/nvidia/rm_robot/src/rm_vision_control/models/target_model.engine'
         
         # ==== 相机内参（保持你的硬编码参数）====

@@ -1,0 +1,28 @@
+{
+  "detection_time": "1969-12-31T16:40:02.371113",
+  "detected": true,
+  "confidence": 0.6169357895851135,
+  "point_3d_robot": [
+    1.1360840466700457,
+    1.0349387937973764,
+    3.531345970982928
+  ],
+  "point_3d_camera": [
+    -1.2106342941980275,
+    -1.035004039406004,
+    2.709
+  ],
+  "depth_mm": 2709.0,
+  "depth_m": 2.709,
+  "bbox": [
+    281.875,
+    109.25,
+    451.125,
+    205.75
+  ],
+  "center_pixel": [
+    366,
+    157
+  ],
+  "image_path": "/home/nvidia/rm_robot/src/rm_vision_control/detection_results/19691231_164002_302628.jpg"
+}

@@ -35,13 +35,13 @@ class ArmController:
         self.pose2 = Pose()
         self.pose2.position.x = self.pose1.position.x
         self.pose2.position.y = self.pose1.position.y
-        self.pose2.position.z = self.pose1.position.z - 0.3  
+        self.pose2.position.z = self.pose1.position.z - 0.3 # !!!!!!!!!!!!!!!!!!!!!!!!!!!
         self.pose2.orientation = self.pose1.orientation
 
         self.detect_pose = Pose()
         self.detect_pose.position.x = 0.15          # 请根据实际情况修改
         self.detect_pose.position.y = 0.0          # 请根据实际情况修改
-        self.detect_pose.position.z = 0.45          # 请根据实际情况修改
+        self.detect_pose.position.z = 0.55          # 请根据实际情况修改
         self.detect_pose.orientation.x = 0.0
         self.detect_pose.orientation.y = -0.707
         self.detect_pose.orientation.z = 0.0
@@ -168,7 +168,7 @@ class ArmController:
             command.command = "get_current_arm_state"
             self.get_state_pub.publish(command)
     
-    def wait_until_home(self, timeout=40.0, check_interval=0.5):
+    def wait_until_home(self, timeout=60.0, check_interval=0.5):
         """阻塞直到机械臂回到home位置"""
         rospy.loginfo("Waiting for arm to reach home position (checking position and orientation)...")
         

@@ -17,13 +17,13 @@ print(f"CUDA 可用: {torch.cuda.is_available()}")  # 应为 True
 
 # 加载第二个模型
 try:
-    trt_model2 = YOLO('/home/nvidia/rm_robot/src/rm_vision_control/models/target_model.engine')
+    trt_model2 = YOLO('/home/nvidia/rm_robot/src/rm_vision_control/models/crack_best.engine')
     print(f"✅ model2.engine 加载成功，设备: {trt_model2.device}")
 except Exception as e:
     print(f"❌ 加载失败: {str(e)}")
 
 # 测试预测 (用测试图像；替换为你的图像路径或 URL)
-test_image = '/home/nvidia/rm_robot/src/rm_vision_control/test.jpg'  
+test_image = '/home/nvidia/Downloads/test_data/3.jpg'  
 
 # model1 预测
 # results1 = trt_model1(test_image)

@@ -25,6 +25,9 @@ class CrackDetectionTask:
         self.is_active = True
         try:
             # 发布小车缓慢速度
+            self.arm_controller.set_arm_state(1)
+            rospy.loginfo("Arm state set to 1")
+            rospy.sleep(0.5)
             self.arm.set_car_speed(0.3)
             rospy.loginfo("Car speed set to 0.3")
             

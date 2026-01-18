@@ -1,0 +1,46 @@
+# 视觉配置
+vision:
+  # YOLOv8模型路径
+  model_paths:
+    crack_detection: "~/models/crack_detection.pt"  # 裂缝检测模型
+    target_detection: "~/models/target_detection.pt"  # 目标检测模型
+  
+  # RealSense相机话题
+  camera_topics:
+    color_image: "/camera/color/image_raw"
+    depth_image: "/camera/aligned_depth_to_color/image_raw"
+    camera_info: "/camera/color/camera_info"
+    
+  # 相机内参（需要根据实际标定修改）
+  camera_intrinsics:
+    fx: 610.0
+    fy: 610.0
+    cx: 320.0
+    cy: 240.0
+    width: 640
+    height: 480
+    
+  # 手眼标定结果（4x4齐次变换矩阵）
+  # camera_to_robot: 相机坐标系到机械臂基座坐标系的变换
+  camera_to_robot:
+    - [1.0, 0.0, 0.0, 0.1]    # x方向偏移
+    - [0.0, 1.0, 0.0, -0.05]  # y方向偏移  
+    - [0.0, 0.0, 1.0, 0.15]   # z方向偏移
+    - [0.0, 0.0, 0.0, 1.0]    # 齐次坐标
+    
+  # 检测参数
+  detection_params:
+    confidence_threshold: 0.5  # 置信度阈值
+    nms_threshold: 0.4        # 非极大值抑制阈值
+    
+  # 16点检测参数
+  grid_detection:
+    grid_size: 0.05           # 网格间距5cm
+    rows: 4
+    cols: 4
+    
+  # 结果保存
+  save_results: true
+  result_dir: "~/detection_results"
+  save_images: true
+  save_annotated: true

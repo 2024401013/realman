@@ -1,0 +1,371 @@
+#!/usr/bin/env python
+# simplified_main_controller.py - 无相机版本的主控制器
+import rospy
+import time
+import os
+import json
+from datetime import datetime
+from geometry_msgs.msg import Pose
+from std_msgs.msg import Int32, Float32
+from rm_msgs.msg import MoveJ, MoveJ_P, MoveL, Plan_State
+
+class SimplifiedMainController:
+    def __init__(self):
+        rospy.init_node('simplified_main_controller')
+        
+        # 配置参数
+        self.home_pose = self.create_pose(0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0)
+        self.pose1 = self.create_pose(-0.3, 0.0, 0.3, -0.707, 0.0, 0.707, 0.0)  # 观测位姿1
+        self.pose2 = self.create_pose(-0.3, 0.0, 0.6, -0.707, 0.0, 0.707, 0.0)  # 观测位姿2 (z+0.5m)
+        
+        # 任务状态
+        self.current_task = None
+        self.is_running = False
+        self.last_detection_time = 0
+        self.detection_interval = 4.0  # 4秒间隔
+        
+        # 16点检测参数
+        self.grid_center = [-0.3, 0.0, 0.5]  # 模拟的目标中心
+        self.grid_size = 0.05  # 5cm间距
+        self.rows = 4
+        self.cols = 4
+        
+        # 发布者
+        self.movej_p_pub = rospy.Publisher('/rm_driver/MoveJ_P_Cmd', MoveJ_P, queue_size=10)
+        self.movel_pub = rospy.Publisher('/rm_driver/MoveL_Cmd', MoveL, queue_size=10)
+        self.speed_pub = rospy.Publisher('/car/speed', Float32, queue_size=10)
+        
+        # 订阅者
+        rospy.Subscriber('/car/is_arrive', Int32, self.car_command_callback)
+        rospy.Subscriber('/rm_driver/Plan_State', Plan_State, self.plan_state_callback)
+        
+        # 创建结果保存目录
+        self.result_dir = "simulated_detections"
+        os.makedirs(self.result_dir, exist_ok=True)
+        
+        rospy.loginfo("Simplified Main Controller Initialized")
+        rospy.loginfo("Waiting for commands...")
+        rospy.loginfo("  is_arrive=1: Start crack detection task")
+        rospy.loginfo("  is_arrive=2: Stop current task")
+        rospy.loginfo("  is_arrive=3: Start 16-point inspection task")
+    
+    def create_pose(self, x, y, z, qx, qy, qz, qw):
+        """创建位姿"""
+        pose = Pose()
+        pose.position.x = x
+        pose.position.y = y
+        pose.position.z = z
+        pose.orientation.x = qx
+        pose.orientation.y = qy
+        pose.orientation.z = qz
+        pose.orientation.w = qw
+        return pose
+    
+    def car_command_callback(self, msg):
+        """处理小车指令"""
+        rospy.loginfo(f"Received car command: {msg.data}")
+        
+        if msg.data == 1 and not self.is_running:
+            # 开始裂缝检测任务
+            self.current_task = 'crack_detection'
+            self.is_running = True
+            rospy.loginfo("Starting crack detection task")
+            
+            # 在新线程中执行任务
+            import threading
+            thread = threading.Thread(target=self.execute_crack_detection)
+            thread.start()
+            
+        elif msg.data == 2 and self.is_running:
+            # 停止当前任务
+            rospy.loginfo(f"Stopping {self.current_task} task")
+            self.is_running = False
+            self.current_task = None
+            
+        elif msg.data == 3 and not self.is_running:
+            # 开始16点检测任务
+            self.current_task = '16point_inspection'
+            self.is_running = True
+            rospy.loginfo("Starting 16-point inspection task")
+            
+            import threading
+            thread = threading.Thread(target=self.execute_16point_inspection)
+            thread.start()
+    
+    def plan_state_callback(self, msg):
+        """规划状态回调"""
+        if msg.state:
+            rospy.loginfo("✓ Plan execution succeeded")
+        else:
+            rospy.logwarn("✗ Plan execution failed")
+    
+    def move_to_pose_jp(self, pose, speed=0.3, timeout=10.0):
+        """使用MoveJ_P移动到位姿"""
+        rospy.loginfo(f"Moving to pose: ({pose.position.x:.2f}, {pose.position.y:.2f}, {pose.position.z:.2f})")
+        
+        cmd = MoveJ_P()
+        cmd.Pose = pose
+        cmd.speed = speed
+        cmd.trajectory_connect = 0
+        
+        self.movej_p_pub.publish(cmd)
+        rospy.sleep(2.0)  # 简单等待，实际应该等待Plan_State
+        
+        return True
+    
+    def move_to_pose_line(self, pose, speed=0.3):
+        """使用MoveL直线移动到位姿"""
+        rospy.loginfo(f"Linear move to: ({pose.position.x:.2f}, {pose.position.y:.2f}, {pose.position.z:.2f})")
+        
+        cmd = MoveL()
+        cmd.Pose = pose
+        cmd.speed = speed
+        cmd.trajectory_connect = 0
+        
+        self.movel_pub.publish(cmd)
+        rospy.sleep(2.0)
+        
+        return True
+    
+    def set_car_speed(self, speed):
+        """控制小车速度"""
+        speed_msg = Float32()
+        speed_msg.data = speed
+        self.speed_pub.publish(speed_msg)
+        rospy.loginfo(f"Set car speed to: {speed}")
+    
+    def simulate_detection(self):
+        """模拟视觉检测"""
+        import random
+        
+        # 模拟检测结果
+        detected = random.random() > 0.7  # 30%的概率检测到裂缝
+        
+        if detected:
+            # 生成模拟的检测结果
+            result = {
+                'timestamp': datetime.now().isoformat(),
+                'detected': True,
+                'confidence': random.uniform(0.6, 0.95),
+                'position': {
+                    'x': random.uniform(-0.1, 0.1),
+                    'y': random.uniform(-0.1, 0.1),
+                    'z': random.uniform(0.2, 0.6)
+                },
+                'bbox': [
+                    random.randint(100, 500),
+                    random.randint(100, 300),
+                    random.randint(300, 600),
+                    random.randint(200, 400)
+                ]
+            }
+            
+            rospy.loginfo(f"Simulated crack detection! Confidence: {result['confidence']:.2f}")
+            return result
+        
+        return {'detected': False}
+    
+    def save_simulated_result(self, result):
+        """保存模拟的检测结果"""
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+        filename = f"simulated_detection_{timestamp}.json"
+        filepath = os.path.join(self.result_dir, filename)
+        
+        with open(filepath, 'w') as f:
+            json.dump(result, f, indent=2)
+        
+        rospy.loginfo(f"Saved simulated result to: {filepath}")
+        return filepath
+    
+    def execute_crack_detection(self):
+        """执行裂缝检测任务"""
+        try:
+            rospy.loginfo("=== Starting Crack Detection Task ===")
+            
+            # 1. 移动到观测位姿pose1
+            if not self.move_to_pose_jp(self.pose1, speed=0.2):
+                rospy.logwarn("Failed to move to pose1")
+                self.is_running = False
+                return
+            
+            # 2. 发布小车速度
+            self.set_car_speed(0.3)
+            rospy.sleep(1.0)
+            
+            # 3. 在pose1和pose2之间往返运动
+            move_to_pose1 = True
+            detection_count = 0
+            
+            while self.is_running and not rospy.is_shutdown():
+                # 移动到目标位姿
+                target_pose = self.pose1 if move_to_pose1 else self.pose2
+                rospy.loginfo(f"Moving to {'pose1' if move_to_pose1 else 'pose2'}")
+                
+                if not self.move_to_pose_jp(target_pose, speed=0.15):
+                    rospy.logwarn("Movement failed, stopping task")
+                    break
+                
+                # 模拟检测
+                rospy.loginfo("Simulating crack detection...")
+                detection_result = self.simulate_detection()
+                
+                # 检查是否需要保存结果
+                if detection_result['detected']:
+                    current_time = time.time()
+                    
+                    if current_time - self.last_detection_time > self.detection_interval:
+                        rospy.loginfo("✓ Valid detection (interval > 4s)")
+                        self.save_simulated_result(detection_result)
+                        self.last_detection_time = current_time
+                        detection_count += 1
+                    else:
+                        rospy.loginfo("✗ Detection too frequent, skipping")
+                
+                # 切换位姿
+                move_to_pose1 = not move_to_pose1
+                
+                # 检查是否继续
+                if not self.is_running:
+                    break
+                
+                # 短暂停顿
+                rospy.sleep(1.0)
+            
+            # 4. 任务结束，回到初始位置
+            rospy.loginfo(f"Task completed. Total detections: {detection_count}")
+            rospy.loginfo("Returning to home position...")
+            self.move_to_pose_jp(self.home_pose, speed=0.2)
+            
+            # 5. 重置状态
+            self.is_running = False
+            self.current_task = None
+            
+            rospy.loginfo("Crack detection task finished successfully")
+            
+        except Exception as e:
+            rospy.logerr(f"Error in crack detection task: {e}")
+            self.is_running = False
+            self.current_task = None
+    
+    def calculate_16_points(self, center, grid_size, rows, cols):
+        """计算16个点的坐标"""
+        points = []
+        
+        # 计算左上角起点
+        start_x = center[0] - (cols - 1) * grid_size / 2
+        start_y = center[1] - (rows - 1) * grid_size / 2
+        
+        # 生成所有点
+        for i in range(rows):
+            for j in range(cols):
+                x = start_x + j * grid_size
+                y = start_y + i * grid_size
+                z = center[2]  # 深度相同
+                points.append((x, y, z))
+        
+        return points
+    
+    def execute_16point_inspection(self):
+        """执行16点检测任务"""
+        try:
+            rospy.loginfo("=== Starting 16-Point Inspection Task ===")
+            
+            # 1. 停止小车
+            self.set_car_speed(0.0)
+            rospy.sleep(1.0)
+            
+            # 2. 计算16个点
+            rospy.loginfo("Calculating 16 points...")
+            points = self.calculate_16_points(
+                self.grid_center,
+                self.grid_size,
+                self.rows,
+                self.cols
+            )
+            
+            rospy.loginfo(f"Calculated {len(points)} points")
+            
+            # 3. 移动到左上角第一个点
+            first_point = points[0]
+            first_pose = self.create_pose(
+                first_point[0], first_point[1], first_point[2],
+                -0.707, 0.0, 0.707, 0.0
+            )
+            
+            rospy.loginfo(f"Moving to first point: ({first_point[0]:.3f}, {first_point[1]:.3f}, {first_point[2]:.3f})")
+            if not self.move_to_pose_jp(first_pose, speed=0.2):
+                rospy.logwarn("Failed to move to first point")
+                self.is_running = False
+                return
+            
+            # 4. 顺序检测所有点
+            for i, point in enumerate(points):
+                if not self.is_running:
+                    rospy.loginfo("Task interrupted")
+                    break
+                
+                rospy.loginfo(f"\n--- Point {i+1}/{len(points)} ---")
+                rospy.loginfo(f"Coordinates: ({point[0]:.3f}, {point[1]:.3f}, {point[2]:.3f})")
+                
+                # 创建目标位姿
+                target_pose = self.create_pose(
+                    point[0], point[1], point[2],
+                    -0.707, 0.0, 0.707, 0.0
+                )
+                
+                # 使用直线运动到达该点
+                rospy.loginfo(f"Moving to point {i+1}...")
+                if not self.move_to_pose_line(target_pose, speed=0.15):
+                    rospy.logwarn(f"Failed to move to point {i+1}, skipping")
+                    continue
+                
+                # 模拟垂直前进10cm
+                rospy.loginfo(f"Approaching (forward 10cm)...")
+                approach_pose = self.create_pose(
+                    point[0] - 0.1 , point[1], point[2],  # 假设z轴向前
+                    -0.707, 0.0, 0.707, 0.0
+                )
+                
+                if not self.move_to_pose_line(approach_pose, speed=0.05):  # 低速前进
+                    rospy.logwarn(f"Failed to approach point {i+1}")
+                
+                # 模拟检测操作
+                rospy.loginfo("Simulating inspection...")
+                rospy.sleep(0.5)
+                
+                # 退回原位
+                rospy.loginfo("Retracting...")
+                if not self.move_to_pose_line(target_pose, speed=0.05):
+                    rospy.logwarn(f"Failed to retract from point {i+1}")
+                
+                # 短暂停顿
+                rospy.sleep(0.3)
+            
+            # 5. 回到初始位置
+            rospy.loginfo("Task completed, returning to home position...")
+            self.move_to_pose_jp(self.home_pose, speed=0.2)
+            
+            # 6. 恢复小车速度
+            self.set_car_speed(0.8)
+            
+            # 7. 重置状态
+            self.is_running = False
+            self.current_task = None
+            
+            rospy.loginfo("16-point inspection task finished successfully")
+            
+        except Exception as e:
+            rospy.logerr(f"Error in 16-point inspection task: {e}")
+            self.is_running = False
+            self.current_task = None
+    
+    def run(self):
+        """运行主控制器"""
+        rospy.spin()
+
+if __name__ == '__main__':
+    try:
+        controller = SimplifiedMainController()
+        controller.run()
+    except rospy.ROSInterruptException:
+        rospy.loginfo("ROS interrupted")

@@ -1,0 +1,1 @@
+/home/nvidia/rm_robot/devel/.private/rm_msgs/include/rm_msgs/Arm_Digital_Output.h

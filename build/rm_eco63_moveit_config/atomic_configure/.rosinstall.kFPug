@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/nvidia/rm_robot/devel/.private/rm_eco63_moveit_config/setup.sh

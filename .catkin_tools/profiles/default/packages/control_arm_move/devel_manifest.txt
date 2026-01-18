@@ -1,0 +1,5 @@
+rm_arm_examples/control_arm_move
+/home/nvidia/rm_robot/devel/.private/control_arm_move/lib/control_arm_move/api_Control_Arm_Move_demo /home/nvidia/rm_robot/devel/lib/control_arm_move/api_Control_Arm_Move_demo
+/home/nvidia/rm_robot/devel/.private/control_arm_move/lib/pkgconfig/control_arm_move.pc /home/nvidia/rm_robot/devel/lib/pkgconfig/control_arm_move.pc
+/home/nvidia/rm_robot/devel/.private/control_arm_move/share/control_arm_move/cmake/control_arm_moveConfig-version.cmake /home/nvidia/rm_robot/devel/share/control_arm_move/cmake/control_arm_moveConfig-version.cmake
+/home/nvidia/rm_robot/devel/.private/control_arm_move/share/control_arm_move/cmake/control_arm_moveConfig.cmake /home/nvidia/rm_robot/devel/share/control_arm_move/cmake/control_arm_moveConfig.cmake

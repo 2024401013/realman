@@ -1,0 +1,8 @@
+prefix=/home/nvidia/rm_robot/devel/.private/rm_control
+
+Name: rm_control
+Description: Description of rm_control
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: actionlib actionlib_msgs control_msgs trajectory_msgs sensor_msgs roscpp rospy std_msgs rm_msgs

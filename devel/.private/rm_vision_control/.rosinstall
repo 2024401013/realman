@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/nvidia/rm_robot/devel/.private/rm_vision_control/setup.sh

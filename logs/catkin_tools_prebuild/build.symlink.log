@@ -1,0 +1,13 @@
+Symlinking /home/nvidia/rm_robot/devel/./_setup_util.py
+Symlinking /home/nvidia/rm_robot/devel/./setup.bash
+Symlinking /home/nvidia/rm_robot/devel/./local_setup.sh
+Symlinking /home/nvidia/rm_robot/devel/./setup.sh
+Symlinking /home/nvidia/rm_robot/devel/./setup.fish
+Symlinking /home/nvidia/rm_robot/devel/./env.sh
+Symlinking /home/nvidia/rm_robot/devel/./local_setup.zsh
+Symlinking /home/nvidia/rm_robot/devel/./setup.zsh
+Symlinking /home/nvidia/rm_robot/devel/./local_setup.bash
+Symlinking /home/nvidia/rm_robot/devel/./local_setup.fish
+Symlinking /home/nvidia/rm_robot/devel/lib/pkgconfig/catkin_tools_prebuild.pc
+Symlinking /home/nvidia/rm_robot/devel/share/catkin_tools_prebuild/cmake/catkin_tools_prebuildConfig.cmake
+Symlinking /home/nvidia/rm_robot/devel/share/catkin_tools_prebuild/cmake/catkin_tools_prebuildConfig-version.cmake

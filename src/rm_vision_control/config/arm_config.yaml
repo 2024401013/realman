@@ -1,0 +1,43 @@
+# 机械臂配置
+arm:
+  # 机械臂型号
+  type: "RM65-B"
+  
+  # 初始位置（需要根据实际情况修改）
+  home_position:
+    x: 0.3
+    y: 0.0
+    z: 0.3
+    roll: 0.0
+    pitch: 3.14159  # π弧度，表示水平向下
+    yaw: 0.0
+  
+  # 观测位置（需要根据实际情况修改）
+  observation_poses:
+    pose1:
+      x: 0.5
+      y: 0.0
+      z: 0.3
+    pose2:
+      x: 0.5
+      y: 0.0
+      z: 0.8
+  
+  # 控制参数
+  control_params:
+    default_speed: 0.3
+    slow_speed: 0.1
+    approach_distance: 0.1  # 前进距离10cm
+    timeout: 10.0  # 规划超时时间
+
+# 任务参数
+tasks:
+  crack_detection:
+    detection_interval: 4.0  # 检测间隔4秒
+    save_results: true
+    
+  16point_inspection:
+    grid_size: 0.05  # 5cm网格间距
+    rows: 4
+    cols: 4
+    approach_speed: 0.1

@@ -1,0 +1,1 @@
+/home/nvidia/rm_robot/devel/.private/rm_gen72_moveit_config/lib/pkgconfig/rm_gen72_moveit_config.pc

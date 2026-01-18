@@ -1,0 +1,8 @@
+prefix=/home/nvidia/rm_robot/install
+
+Name: rm_description
+Description: Description of rm_description
+Version: 1.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

@@ -1,0 +1,1 @@
+/home/nvidia/rm_robot/devel/.private/rm_msgs/share/gennodejs/ros/rm_msgs/msg/RS485_Mode.js

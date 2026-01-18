@@ -1,0 +1,4 @@
+[35m[1mScanning dependencies of target api_Force_Position_Control_demo[0m
+[ 50%] [32mBuilding CXX object CMakeFiles/api_Force_Position_Control_demo.dir/src/api_force_position_control_demo.cpp.o[0m
+[100%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/force_position_control/lib/force_position_control/api_Force_Position_Control_demo[0m
+[100%] Built target api_Force_Position_Control_demo

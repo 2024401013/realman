@@ -1,0 +1,4 @@
+[35m[1mScanning dependencies of target api_Get_Arm_State_demo[0m
+[ 50%] [32mBuilding CXX object CMakeFiles/api_Get_Arm_State_demo.dir/src/api_Get_Arm_State_demo.cpp.o[0m
+[100%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/get_arm_state/lib/get_arm_state/api_Get_Arm_State_demo[0m
+[100%] Built target api_Get_Arm_State_demo

@@ -1,0 +1,1 @@
+/home/nvidia/rm_robot/devel/.private/rm_msgs/share/common-lisp/ros/rm_msgs/msg/_package_Arm_Current_State.lisp

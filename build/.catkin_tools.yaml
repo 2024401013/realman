@@ -1,0 +1,6 @@
+devel_space: /home/nvidia/rm_robot/devel
+install: false
+install_space: /home/nvidia/rm_robot/install
+profile: default
+source_space: /home/nvidia/rm_robot/src
+workspace: /home/nvidia/rm_robot

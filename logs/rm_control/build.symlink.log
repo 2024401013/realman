@@ -1,0 +1,4 @@
+Symlinking /home/nvidia/rm_robot/devel/lib/rm_control/rm_control
+Symlinking /home/nvidia/rm_robot/devel/lib/pkgconfig/rm_control.pc
+Symlinking /home/nvidia/rm_robot/devel/share/rm_control/cmake/rm_controlConfig-version.cmake
+Symlinking /home/nvidia/rm_robot/devel/share/rm_control/cmake/rm_controlConfig.cmake

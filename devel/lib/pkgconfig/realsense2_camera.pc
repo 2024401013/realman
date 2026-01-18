@@ -1,0 +1,1 @@
+/home/nvidia/rm_robot/devel/.private/realsense2_camera/lib/pkgconfig/realsense2_camera.pc

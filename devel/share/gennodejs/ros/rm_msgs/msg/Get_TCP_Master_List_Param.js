@@ -1,0 +1,1 @@
+/home/nvidia/rm_robot/devel/.private/rm_msgs/share/gennodejs/ros/rm_msgs/msg/Get_TCP_Master_List_Param.js

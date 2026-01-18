@@ -1,0 +1,1 @@
+/home/nvidia/rm_robot/devel/.private/rm_msgs/lib/python3/dist-packages/rm_msgs/msg/_Get_TCP_Master_List_Param.py

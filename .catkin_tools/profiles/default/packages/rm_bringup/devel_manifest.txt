@@ -1,0 +1,4 @@
+rm_bringup
+/home/nvidia/rm_robot/devel/.private/rm_bringup/lib/pkgconfig/rm_bringup.pc /home/nvidia/rm_robot/devel/lib/pkgconfig/rm_bringup.pc
+/home/nvidia/rm_robot/devel/.private/rm_bringup/share/rm_bringup/cmake/rm_bringupConfig.cmake /home/nvidia/rm_robot/devel/share/rm_bringup/cmake/rm_bringupConfig.cmake
+/home/nvidia/rm_robot/devel/.private/rm_bringup/share/rm_bringup/cmake/rm_bringupConfig-version.cmake /home/nvidia/rm_robot/devel/share/rm_bringup/cmake/rm_bringupConfig-version.cmake

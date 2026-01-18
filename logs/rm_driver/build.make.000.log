@@ -1,0 +1,5 @@
+[35m[1mScanning dependencies of target rm_driver[0m
+[ 33%] [32mBuilding CXX object CMakeFiles/rm_driver.dir/src/rm_driver.cpp.o[0m
+[ 66%] [32mBuilding C object CMakeFiles/rm_driver.dir/src/cJSON.c.o[0m
+[100%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_driver/lib/rm_driver/rm_driver[0m
+[100%] Built target rm_driver

@@ -1,0 +1,4 @@
+Symlinking /home/nvidia/rm_robot/devel/lib/force_position_control/api_Force_Position_Control_demo
+Symlinking /home/nvidia/rm_robot/devel/lib/pkgconfig/force_position_control.pc
+Symlinking /home/nvidia/rm_robot/devel/share/force_position_control/cmake/force_position_controlConfig.cmake
+Symlinking /home/nvidia/rm_robot/devel/share/force_position_control/cmake/force_position_controlConfig-version.cmake

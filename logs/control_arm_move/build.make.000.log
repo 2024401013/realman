@@ -1,0 +1,4 @@
+[35m[1mScanning dependencies of target api_Control_Arm_Move_demo[0m
+[ 50%] [32mBuilding CXX object CMakeFiles/api_Control_Arm_Move_demo.dir/src/api_move_demo.cpp.o[0m
+[100%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/control_arm_move/lib/control_arm_move/api_Control_Arm_Move_demo[0m
+[100%] Built target api_Control_Arm_Move_demo

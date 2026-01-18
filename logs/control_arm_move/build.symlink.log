@@ -1,0 +1,4 @@
+Symlinking /home/nvidia/rm_robot/devel/lib/control_arm_move/api_Control_Arm_Move_demo
+Symlinking /home/nvidia/rm_robot/devel/lib/pkgconfig/control_arm_move.pc
+Symlinking /home/nvidia/rm_robot/devel/share/control_arm_move/cmake/control_arm_moveConfig-version.cmake
+Symlinking /home/nvidia/rm_robot/devel/share/control_arm_move/cmake/control_arm_moveConfig.cmake

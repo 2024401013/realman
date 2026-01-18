@@ -1,0 +1,1 @@
+/home/nvidia/rm_robot/devel/.private/rm_msgs/share/roseus/ros/rm_msgs/msg/Tool_Digital_Output.l

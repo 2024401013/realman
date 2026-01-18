@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/nvidia/rm_robot/devel/.private/rml_63_moveit_config/setup.sh

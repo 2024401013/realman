@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- 启动RealSense相机 -->
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+        <arg name="align_depth" value="true" />
+        <arg name="enable_pointcloud" value="true" />
+        <arg name="filters" value="pointcloud" />
+    </include>
+
+    <!-- 启动RealMan机械臂 -->
+    <!-- 根据您的机械臂型号修改<arm_type> -->
+    <include file="$(find rm_bringup)/launch/rm_65_robot.launch" />
+    
+    <!-- 启动主控制器 -->
+    <node name="main_controller" pkg="rm_vision_control" type="main_controller.py" output="screen" />
+    
+    <!-- 如果需要，可以启动单独的视觉检测节点 -->
+    <!-- <node name="vision_detector" pkg="rm_vision_control" type="vision_detector.py" output="screen" /> -->
+</launch>

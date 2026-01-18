@@ -1,0 +1,1 @@
+/home/nvidia/rm_robot/devel/.private/rm_demo/lib/pkgconfig/rm_demo.pc

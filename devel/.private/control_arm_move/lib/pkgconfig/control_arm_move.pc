@@ -1,0 +1,8 @@
+prefix=/home/nvidia/rm_robot/devel/.private/control_arm_move
+
+Name: control_arm_move
+Description: Description of control_arm_move
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

@@ -34,6 +34,11 @@ class PointInspectionTask:
             # 停止小车
             self.arm.set_car_speed(0.0)
             rospy.loginfo("Car stopped")
+
+            # 移动到观测位置
+            if not self.arm.move_to_pose_jp(self.arm.detect_pose, speed=0.3):
+                rospy.logerr("Failed to move to detect pose")
+                return
             
             # 识别目标并计算16个点
             rospy.loginfo("Detecting target...")

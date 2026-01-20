@@ -14,7 +14,7 @@ class ArmController:
         self.home_pose = Pose()
         self.home_pose.position.x = 0.0     # 请根据实际情况修改
         self.home_pose.position.y = 0.0      # 请根据实际情况修改  
-        self.home_pose.position.z = 1.0      # 请根据实际情况修改
+        self.home_pose.position.z = 0.85      # 请根据实际情况修改
         self.home_pose.orientation.x = 0
         self.home_pose.orientation.y = 0
         self.home_pose.orientation.z = 1.0
@@ -26,7 +26,7 @@ class ArmController:
         self.pose1 = Pose()
         self.pose1.position.x = - 0.3          # 请根据实际情况修改
         self.pose1.position.y = 0.0          # 请根据实际情况修改
-        self.pose1.position.z = 0.7          # 请根据实际情况修改
+        self.pose1.position.z = 0.65          # 请根据实际情况修改
         self.pose1.orientation.x = -0.707
         self.pose1.orientation.y = 0
         self.pose1.orientation.z = 0.707
@@ -37,6 +37,15 @@ class ArmController:
         self.pose2.position.y = self.pose1.position.y
         self.pose2.position.z = self.pose1.position.z - 0.3  
         self.pose2.orientation = self.pose1.orientation
+
+        self.detect_pose = Pose()
+        self.detect_pose.position.x = - 0.3          # 请根据实际情况修改
+        self.detect_pose.position.y = 0.0          # 请根据实际情况修改
+        self.detect_pose.position.z = 0.45          # 请根据实际情况修改
+        self.detect_pose.orientation.x = -0.707
+        self.detect_pose.orientation.y = 0
+        self.detect_pose.orientation.z = 0.707
+        self.detect_pose.orientation.w = 0
         # =================================
         
         # 发布者

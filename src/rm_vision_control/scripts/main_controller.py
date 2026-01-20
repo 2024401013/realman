@@ -4,6 +4,8 @@
 import rospy
 import signal
 import sys
+import threading  
+from std_msgs.msg import Int32  
 from arm_controller import ArmController
 from vision_detector import VisionDetector
 from crack_detection import CrackDetectionTask

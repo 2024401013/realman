@@ -7,6 +7,7 @@ import torch
 import numpy as np
 import json
 import os
+import tf  
 from datetime import datetime
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
@@ -37,8 +38,12 @@ class VisionDetector:
             [-0.0212575811892748]   # k3
         ], dtype=np.float32)
         
-        # 手眼标定结果（需要根据实际标定修改）
-        self.T_camera_to_robot = np.eye(4)  # 相机到机械臂基座的变换矩阵
+        # 1. 相机相对于link6（机械臂末端）的平移偏移（测量值：左7.5cm，高2.8cm）
+        self.camera_to_link6_trans = np.array([0.0, -0.075, 0.028])  # x=0, y=-0.075m, z=0.028m
+        # 2. 相机相对于link6的旋转偏移（平行安装，无旋转，四元数）
+        self.camera_to_link6_rot = np.array([0.0, 0.0, 0.0, 1.0])
+        # 3. TF监听器：实时获取link6在base_link下的位姿
+        self.tf_listener = tf.TransformListener()
         # =================================
         
         # 加载YOLOv8模型
@@ -122,7 +127,7 @@ class VisionDetector:
                 'bbox': bbox.tolist(),
                 'center_pixel': (center_x, center_y),
                 'depth': depth,
-                'point_3d_robot': point_3d_robot,
+                'point_3d_robot': point_3d_robot.tolist() if point_3d_robot is not None else None,
                 'annotated_image': annotated_image,
                 'timestamp': rospy.Time.now().to_sec()
             }
@@ -155,7 +160,7 @@ class VisionDetector:
                 point_3d_camera = self.pixel_to_3d(center_x, center_y, depth)
                 point_3d_robot = self.transform_to_robot(point_3d_camera)
                 
-                return point_3d_robot
+                return point_3d_robot.tolist() if point_3d_robot is not None else None
             
         return None
     
@@ -195,15 +200,48 @@ class VisionDetector:
         return np.array([x, y, z])
     
     def transform_to_robot(self, point_camera):
-        """将相机坐标系下的点转换到机械臂基座坐标系"""
+        """
+        将相机坐标系点转换到机械臂基座坐标系
+        步骤：相机系 → link6系（硬编码偏移） → base_link系（实时TF）
+        """
         if point_camera is None:
             return None
         
-        # 转换为齐次坐标
-        point_camera_h = np.append(point_camera, 1)
-        point_robot_h = np.dot(self.T_camera_to_robot, point_camera_h)
+        try:
+            # 1. 获取link6在base_link下的实时位姿（平移+四元数）
+            (link6_trans, link6_rot) = self.tf_listener.lookupTransform(
+                "base_link", "link6", rospy.Time(0)
+            )
+            
+            # 2. 构建「相机→link6」的变换矩阵
+            camera_to_link6_mat = self.tf_listener.fromTranslationRotation(
+                self.camera_to_link6_trans, self.camera_to_link6_rot
+            )
+            
+            # 3. 相机系点转齐次坐标
+            point_camera_h = np.append(point_camera, 1)
+            
+            # 4. 转换到link6系
+            point_link6_h = np.dot(camera_to_link6_mat, point_camera_h)
+            point_link6 = point_link6_h[:3]
+            
+            # 5. 构建「link6→base_link」的变换矩阵
+            link6_to_base_mat = self.tf_listener.fromTranslationRotation(
+                link6_trans, link6_rot
+            )
+            
+            # 6. link6系点转齐次坐标
+            point_link6_h = np.append(point_link6, 1)
+            
+            # 7. 转换到base_link系（机械臂基座坐标系）
+            point_base_h = np.dot(link6_to_base_mat, point_link6_h)
+            point_base = point_base_h[:3]
+            
+            return point_base
         
-        return point_robot_h[:3]
+        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as e:
+            rospy.logwarn(f"TF变换失败（link6→base_link）: {e}")
+            return None
     
     def save_detection_result(self, detection_result, save_image=True):
         """保存检测结果"""
@@ -234,3 +272,8 @@ class VisionDetector:
         
         rospy.loginfo(f"Detection result saved: {json_path}")
         return json_path
+
+if __name__ == "__main__":
+    rospy.init_node("vision_detector_node")
+    detector = VisionDetector()
+    rospy.spin()

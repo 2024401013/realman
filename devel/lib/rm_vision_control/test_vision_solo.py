@@ -1,1 +1,0 @@
-/home/nvidia/rm_robot/devel/.private/rm_vision_control/lib/rm_vision_control/test_vision_solo.py

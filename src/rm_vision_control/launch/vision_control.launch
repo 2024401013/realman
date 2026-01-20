@@ -9,7 +9,7 @@
 
     <!-- 启动RealMan机械臂 -->
     <!-- 根据您的机械臂型号修改<arm_type> -->
-    <include file="$(find rm_bringup)/launch/rm_65_robot.launch" />
+    <!-- <include file="$(find rm_bringup)/launch/rm_65_robot.launch" /> -->
     
     <!-- 启动主控制器 -->
     <node name="main_controller" pkg="rm_vision_control" type="main_controller.py" output="screen" />

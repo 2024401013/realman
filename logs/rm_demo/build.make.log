@@ -1,56 +1,56 @@
 [35m[1mScanning dependencies of target rm_gen72_pick_place_demo[0m
 [35m[1mScanning dependencies of target rm_eco65_pick_place_demo[0m
-[  2%] [32mBuilding CXX object CMakeFiles/rm_eco65_pick_place_demo.dir/src/api_eco65_pick_place_demo.cpp.o[0m
-[  4%] [32mBuilding CXX object CMakeFiles/rm_gen72_pick_place_demo.dir/src/api_gen72_pick_place_demo.cpp.o[0m
-[35m[1mScanning dependencies of target rm_63_pick_place_demo[0m
-[  6%] [32mBuilding CXX object CMakeFiles/rm_63_pick_place_demo.dir/src/api_rml63_pick_place_demo.cpp.o[0m
-[  8%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/rm_gen72_pick_place_demo[0m
-[ 10%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/rm_eco65_pick_place_demo[0m
-[ 12%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/rm_63_pick_place_demo[0m
-[ 12%] Built target rm_gen72_pick_place_demo
 [35m[1mScanning dependencies of target rm_75_pick_place_demo[0m
-[ 14%] [32mBuilding CXX object CMakeFiles/rm_75_pick_place_demo.dir/src/api_rm75_pick_place_demo.cpp.o[0m
-[ 14%] Built target rm_eco65_pick_place_demo
+[35m[1mScanning dependencies of target rm_63_pick_place_demo[0m
+[  2%] [32mBuilding CXX object CMakeFiles/rm_75_pick_place_demo.dir/src/api_rm75_pick_place_demo.cpp.o[0m
+[  4%] [32mBuilding CXX object CMakeFiles/rm_eco65_pick_place_demo.dir/src/api_eco65_pick_place_demo.cpp.o[0m
+[  6%] [32mBuilding CXX object CMakeFiles/rm_gen72_pick_place_demo.dir/src/api_gen72_pick_place_demo.cpp.o[0m
+[  8%] [32mBuilding CXX object CMakeFiles/rm_63_pick_place_demo.dir/src/api_rml63_pick_place_demo.cpp.o[0m
+[ 10%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/rm_eco65_pick_place_demo[0m
+[ 12%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/rm_gen72_pick_place_demo[0m
+[ 14%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/rm_75_pick_place_demo[0m
+[ 16%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/rm_63_pick_place_demo[0m
+[ 16%] Built target rm_gen72_pick_place_demo
+[ 16%] Built target rm_eco65_pick_place_demo
+[ 16%] Built target rm_75_pick_place_demo
 [35m[1mScanning dependencies of target rm_65_pick_place_demo[0m
-[ 16%] [32mBuilding CXX object CMakeFiles/rm_65_pick_place_demo.dir/src/api_rm65_pick_place_demo.cpp.o[0m
-[ 16%] Built target rm_63_pick_place_demo
 [35m[1mScanning dependencies of target getArmState_publisher[0m
-[ 18%] [32mBuilding CXX object CMakeFiles/getArmState_publisher.dir/src/api_getArmCurrentState.cpp.o[0m
-[ 20%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/getArmState_publisher[0m
-[ 20%] Built target getArmState_publisher
 [35m[1mScanning dependencies of target api_teach_demo[0m
+[ 18%] [32mBuilding CXX object CMakeFiles/getArmState_publisher.dir/src/api_getArmCurrentState.cpp.o[0m
+[ 20%] [32mBuilding CXX object CMakeFiles/rm_65_pick_place_demo.dir/src/api_rm65_pick_place_demo.cpp.o[0m
 [ 22%] [32mBuilding CXX object CMakeFiles/api_teach_demo.dir/src/api_teach_demo.cpp.o[0m
-[ 25%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/api_teach_demo[0m
-[ 25%] Built target api_teach_demo
+[ 22%] Built target rm_63_pick_place_demo
 [35m[1mScanning dependencies of target api_ChangeWorkFrame_demo[0m
-[ 27%] [32mBuilding CXX object CMakeFiles/api_ChangeWorkFrame_demo.dir/src/api_ChangeWorkFrame_demo.cpp.o[0m
+[ 25%] [32mBuilding CXX object CMakeFiles/api_ChangeWorkFrame_demo.dir/src/api_ChangeWorkFrame_demo.cpp.o[0m
+[ 27%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/getArmState_publisher[0m
+[ 29%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/api_teach_demo[0m
+[ 31%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/api_ChangeWorkFrame_demo[0m
+[ 31%] Built target getArmState_publisher
+[ 31%] Built target api_teach_demo
 [35m[1mScanning dependencies of target api_ChangeToolName_demo[0m
-[ 29%] [32mBuilding CXX object CMakeFiles/api_ChangeToolName_demo.dir/src/api_ChangeToolName_demo.cpp.o[0m
-[ 31%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/rm_65_pick_place_demo[0m
-[ 33%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/rm_75_pick_place_demo[0m
-[ 33%] Built target rm_75_pick_place_demo
 [35m[1mScanning dependencies of target api_gen72_moveJ_P_demo[0m
+[ 33%] [32mBuilding CXX object CMakeFiles/api_ChangeToolName_demo.dir/src/api_ChangeToolName_demo.cpp.o[0m
 [ 35%] [32mBuilding CXX object CMakeFiles/api_gen72_moveJ_P_demo.dir/src/api_gen72_moveJ_P_demo.cpp.o[0m
-[ 35%] Built target rm_65_pick_place_demo
+[ 35%] Built target api_ChangeWorkFrame_demo
 [35m[1mScanning dependencies of target api_moveJ_P_demo[0m
 [ 37%] [32mBuilding CXX object CMakeFiles/api_moveJ_P_demo.dir/src/api_moveJ_P_demo.cpp.o[0m
-[ 39%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/api_ChangeWorkFrame_demo[0m
-[ 39%] Built target api_ChangeWorkFrame_demo
-[35m[1mScanning dependencies of target api_moveJ_demo[0m
-[ 41%] [32mBuilding CXX object CMakeFiles/api_moveJ_demo.dir/src/api_moveJ_demo.cpp.o[0m
-[ 43%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/api_ChangeToolName_demo[0m
+[ 39%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/api_ChangeToolName_demo[0m
+[ 41%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/api_gen72_moveJ_P_demo[0m
+[ 43%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/api_moveJ_P_demo[0m
 [ 43%] Built target api_ChangeToolName_demo
+[35m[1mScanning dependencies of target api_moveJ_demo[0m
+[ 43%] Built target api_gen72_moveJ_P_demo
+[ 45%] [32mBuilding CXX object CMakeFiles/api_moveJ_demo.dir/src/api_moveJ_demo.cpp.o[0m
 [35m[1mScanning dependencies of target test_api_movel[0m
-[ 45%] [32mBuilding CXX object CMakeFiles/test_api_movel.dir/src/test_api_movel.cpp.o[0m
-[ 47%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/api_gen72_moveJ_P_demo[0m
-[ 50%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/api_moveJ_P_demo[0m
-[ 50%] Built target api_gen72_moveJ_P_demo
+[ 47%] [32mBuilding CXX object CMakeFiles/test_api_movel.dir/src/test_api_movel.cpp.o[0m
+[ 50%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/rm_65_pick_place_demo[0m
+[ 50%] Built target api_moveJ_P_demo
 [35m[1mScanning dependencies of target arm_eco65_planning_scene_ros_api_demo[0m
 [ 52%] [32mBuilding CXX object CMakeFiles/arm_eco65_planning_scene_ros_api_demo.dir/src/arm_eco65_planning_scene_ros_api_demo.cpp.o[0m
-[ 54%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/api_moveJ_demo[0m
-[ 54%] Built target api_moveJ_P_demo
+[ 52%] Built target rm_65_pick_place_demo
 [35m[1mScanning dependencies of target arm_75_planning_scene_ros_api_demo[0m
-[ 56%] [32mBuilding CXX object CMakeFiles/arm_75_planning_scene_ros_api_demo.dir/src/arm_gen72_planning_scene_ros_api_demo.cpp.o[0m
+[ 54%] [32mBuilding CXX object CMakeFiles/arm_75_planning_scene_ros_api_demo.dir/src/arm_gen72_planning_scene_ros_api_demo.cpp.o[0m
+[ 56%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/api_moveJ_demo[0m
 [ 56%] Built target api_moveJ_demo
 [35m[1mScanning dependencies of target arm_gen72_planning_scene_ros_api_demo[0m
 [ 58%] [32mBuilding CXX object CMakeFiles/arm_gen72_planning_scene_ros_api_demo.dir/src/arm_gen72_planning_scene_ros_api_demo.cpp.o[0m
@@ -60,37 +60,31 @@
 [ 62%] [32mBuilding CXX object CMakeFiles/arm_63_planning_scene_ros_api_demo.dir/src/arm_63_planning_scene_ros_api_demo.cpp.o[0m
 [ 64%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/arm_eco65_planning_scene_ros_api_demo[0m
 [ 66%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/arm_75_planning_scene_ros_api_demo[0m
-[ 68%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/arm_gen72_planning_scene_ros_api_demo[0m
-[ 68%] Built target arm_eco65_planning_scene_ros_api_demo
+[ 66%] Built target arm_eco65_planning_scene_ros_api_demo
 [35m[1mScanning dependencies of target api_gen72_moveL_demo[0m
+[ 68%] [32mBuilding CXX object CMakeFiles/api_gen72_moveL_demo.dir/src/api_gen72_moveL_demo.cpp.o[0m
 [ 68%] Built target arm_75_planning_scene_ros_api_demo
-[ 70%] [32mBuilding CXX object CMakeFiles/api_gen72_moveL_demo.dir/src/api_gen72_moveL_demo.cpp.o[0m
 [35m[1mScanning dependencies of target planning_scene_ros_api_demo[0m
-[ 72%] [32mBuilding CXX object CMakeFiles/planning_scene_ros_api_demo.dir/src/planning_scene_ros_api_demo.cpp.o[0m
+[ 70%] [32mBuilding CXX object CMakeFiles/planning_scene_ros_api_demo.dir/src/planning_scene_ros_api_demo.cpp.o[0m
+[ 72%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/arm_gen72_planning_scene_ros_api_demo[0m
 [ 72%] Built target arm_gen72_planning_scene_ros_api_demo
+[ 75%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/api_gen72_moveL_demo[0m
 [35m[1mScanning dependencies of target api_Get_Arm_State_demo2[0m
-[ 75%] [32mBuilding CXX object CMakeFiles/api_Get_Arm_State_demo2.dir/src/api_Get_Arm_State_demo.cpp.o[0m
-[ 77%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/api_gen72_moveL_demo[0m
-[ 79%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/api_Get_Arm_State_demo2[0m
-[ 79%] Built target api_gen72_moveL_demo
+[ 77%] [32mBuilding CXX object CMakeFiles/api_Get_Arm_State_demo2.dir/src/api_Get_Arm_State_demo.cpp.o[0m
+[ 77%] Built target api_gen72_moveL_demo
 [35m[1mScanning dependencies of target arm_eco63_planning_scene_ros_api_demo[0m
-[ 81%] [32mBuilding CXX object CMakeFiles/arm_eco63_planning_scene_ros_api_demo.dir/src/arm_eco63_planning_scene_ros_api_demo.cpp.o[0m
+[ 79%] [32mBuilding CXX object CMakeFiles/arm_eco63_planning_scene_ros_api_demo.dir/src/arm_eco63_planning_scene_ros_api_demo.cpp.o[0m
+[ 81%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/api_Get_Arm_State_demo2[0m
 [ 81%] Built target api_Get_Arm_State_demo2
+[ 83%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/arm_63_planning_scene_ros_api_demo[0m
 [35m[1mScanning dependencies of target api_moveL_demo[0m
-[ 83%] [32mBuilding CXX object CMakeFiles/api_moveL_demo.dir/src/api_moveL_demo.cpp.o[0m
-[ 85%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/api_moveL_demo[0m
-[ 87%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/arm_63_planning_scene_ros_api_demo[0m
-[ 87%] Built target api_moveL_demo
+[ 85%] [32mBuilding CXX object CMakeFiles/api_moveL_demo.dir/src/api_moveL_demo.cpp.o[0m
+[ 85%] Built target arm_63_planning_scene_ros_api_demo
 [35m[1mScanning dependencies of target arm_65_planning_scene_ros_api_demo[0m
-[ 89%] [32mBuilding CXX object CMakeFiles/arm_65_planning_scene_ros_api_demo.dir/src/arm_65_planning_scene_ros_api_demo.cpp.o[0m
-[ 89%] Built target arm_63_planning_scene_ros_api_demo
+[ 87%] [32mBuilding CXX object CMakeFiles/arm_65_planning_scene_ros_api_demo.dir/src/arm_65_planning_scene_ros_api_demo.cpp.o[0m
+[ 89%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/api_moveL_demo[0m
+[ 89%] Built target api_moveL_demo
 [35m[1mScanning dependencies of target rm_eco63_pick_place_demo[0m
 [ 91%] [32mBuilding CXX object CMakeFiles/rm_eco63_pick_place_demo.dir/src/api_eco63_pick_place_demo.cpp.o[0m
 [ 93%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/planning_scene_ros_api_demo[0m
 [ 93%] Built target planning_scene_ros_api_demo
-[ 95%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/arm_eco63_planning_scene_ros_api_demo[0m
-[ 95%] Built target arm_eco63_planning_scene_ros_api_demo
-[ 97%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/rm_eco63_pick_place_demo[0m
-[ 97%] Built target rm_eco63_pick_place_demo
-[100%] [32m[1mLinking CXX executable /home/nvidia/rm_robot/devel/.private/rm_demo/lib/rm_demo/arm_65_planning_scene_ros_api_demo[0m
-[100%] Built target arm_65_planning_scene_ros_api_demo

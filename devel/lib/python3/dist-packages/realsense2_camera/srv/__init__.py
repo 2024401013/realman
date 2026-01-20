@@ -1,1 +1,0 @@
-/home/nvidia/rm_robot/devel/.private/realsense2_camera/lib/python3/dist-packages/realsense2_camera/srv/__init__.py

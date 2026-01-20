@@ -1,1 +1,0 @@
-/home/nvidia/rm_robot/devel/.private/realsense2_camera/share/roseus/ros/realsense2_camera/manifest.l

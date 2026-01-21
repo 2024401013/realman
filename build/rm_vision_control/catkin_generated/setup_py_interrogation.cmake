@@ -1,0 +1,7 @@
+set(rm_vision_control_SETUP_PY_SETUP_MODULE "distutils.core")
+set(rm_vision_control_SETUP_PY_VERSION "0.1.0")
+set(rm_vision_control_SETUP_PY_SCRIPTS "")
+set(rm_vision_control_SETUP_PY_PACKAGES "rm_vision_control")
+set(rm_vision_control_SETUP_PY_PACKAGE_DIRS "src/rm_vision_control")
+set(rm_vision_control_SETUP_PY_MODULES "")
+set(rm_vision_control_SETUP_PY_MODULE_DIRS "")

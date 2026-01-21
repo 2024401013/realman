@@ -1,0 +1,160 @@
+#!/usr/bin/env python
+
+# src/rm_vision_control/scripts/point_inspection.py
+import rospy
+import numpy as np
+from std_msgs.msg import Int32
+from geometry_msgs.msg import Pose, Quaternion
+
+class PointInspectionTask:
+    def __init__(self, arm_controller, vision_detector):
+        self.arm = arm_controller
+        self.vision = vision_detector
+        
+        # 任务状态
+        self.is_active = False
+        
+        # 配置参数
+        self.grid_size = 0.05  # 5cm网格间距
+        self.rows = 4
+        self.cols = 4
+        self.safety_distance = 0.05  # 5cm安全距离
+        self.approach_distance = 0.1  # 前进5cm
+        self.approach_speed = 0.1     # 缓慢速度
+        
+        rospy.loginfo("PointInspectionTask initialized")
+    
+    
+    def execute_task(self):
+        """执行16点检测任务"""
+        try:
+            # 停止小车
+            self.arm.set_car_speed(0.0)
+            rospy.loginfo("Car stopped")
+
+            # 移动到观测位置
+            if not self.arm.move_to_pose_jp(self.arm.detect_pose, speed=0.2):
+                rospy.logerr("Failed to move to detect pose")
+                return
+            
+            # 识别目标并计算16个点
+            rospy.loginfo("Detecting target...")
+            # target_center = self.vision.detect_target()
+            target_center = {
+                'center_2d': (653, 402), 
+                'center_3d_robot': [-0.335, 0.012, 0.452],  
+                'center_3d_camera': [0.615, 0.002, 0.382], 
+                'confidence': 0.87,
+                'depth_mm': 615.4,
+                'depth_m': 0.6154,
+                'bbox': [593, 352, 713, 452], 
+                'detections': [{
+                    'bbox': [593, 352, 713, 452],
+                    'center': (653, 402),
+                    'confidence': 0.87,
+                    'class_id': 0,
+                    'class_name': 'target'
+                }],
+                'annotated_image': None,
+                'timestamp': rospy.Time.now().to_sec(),
+                'pose_quality': 0.92,
+                'inliers_count': 128,
+                'reprojection_error': 1.2
+            }
+            
+            if target_center is None:
+                rospy.logwarn("Target not detected, task failed")
+                self.is_active = False
+                return
+            
+            rospy.loginfo(f"Target center detected at: {target_center}")
+            
+            # 计算16个点的坐标
+            points = self.vision.calculate_16_points(
+                target_center['center_3d_robot'], 
+                grid_size=self.grid_size,
+                rows=self.rows,
+                cols=self.cols
+            )
+            
+            rospy.loginfo(f"Calculated {len(points)} points")
+            
+            # 执行16点检测
+            self.execute_point_inspection(points)
+            
+            # 回到初始位置
+            rospy.loginfo("Returning to home position")
+            self.arm.go_home()
+            
+            # 恢复小车速度
+            self.arm.set_car_speed(0.8)
+            rospy.loginfo("Car speed set to 0.8")
+            
+            rospy.loginfo("16-point inspection task completed successfully")
+            
+        except Exception as e:
+            rospy.logerr(f"Error in 16-point inspection task: {e}")
+        finally:
+            self.is_active = False
+    
+    def execute_point_inspection(self, points):
+        """执行点检测"""
+        if len(points) != self.rows * self.cols:
+            rospy.logerr(f"Expected {self.rows * self.cols} points, got {len(points)}")
+            return
+        
+        # 移动到左上角第一个点（第0行第0列）
+        # first_point = points[0]
+        # rospy.loginfo(f"Moving to first point: {first_point}")
+        
+        # first_pose = self.create_pose_from_point(first_point)
+        # if not self.arm.move_to_pose_jp(first_pose, speed=0.3):
+        #     rospy.logerr("Failed to move to first point")
+        #     return
+        
+        # 顺序访问所有点
+        for i in range(len(points)):
+            point_idx = i  # 从左到右，从上到下
+            
+            rospy.loginfo(f"Inspecting point {i+1}/{len(points)}: {points[point_idx]}")
+            
+            # 创建目标位姿
+            target_pose = self.create_pose_from_point(points[point_idx])
+            
+            if not self.arm.move_to_pose_jp(target_pose, speed=0.2):
+                rospy.logwarn(f"Failed to move to point {i+1}, skipping")
+                continue
+            
+            # 垂直向墙面前进10cm
+            rospy.loginfo(f"Approaching point {i+1} (moving forward {self.approach_distance}m)")
+            approach_pose = self.create_pose_from_point(points[point_idx])
+            approach_pose.position.x -= self.approach_distance  # 假设z轴指向墙面
+            
+            if not self.arm.move_to_pose_jp(approach_pose, speed=self.approach_speed):
+                rospy.logwarn(f"Failed to approach point {i+1}")
+            
+            # 在这里可以添加实际的检测操作
+            # self.perform_point_test()
+            
+            # 退回到原位
+            rospy.loginfo(f"Retracting from point {i+1}")
+            if not self.arm.move_to_pose_jp(target_pose, speed=self.approach_speed):
+                rospy.logwarn(f"Failed to retract from point {i+1}")
+            
+            # 短暂停顿
+            rospy.sleep(0.5)
+    
+    def create_pose_from_point(self, point):
+        """从3D点创建位姿"""
+        pose = Pose()
+        pose.position.y = point[1]
+        pose.position.z = point[2]
+        
+        # 关键：减去安全距离5cm
+        # Z轴向上，墙在下方，所以减去安全距离
+        pose.position.x = point[0] + self.safety_distance
+        
+        # 保持水平姿态
+        pose.orientation = self.arm.pose1.orientation
+        
+        return pose

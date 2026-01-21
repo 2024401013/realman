@@ -1,0 +1,12 @@
+Symlinking /home/nvidia/rm_robot/devel/lib/rm_vision_control/utils.py
+Symlinking /home/nvidia/rm_robot/devel/lib/rm_vision_control/vision_detector.py
+Symlinking /home/nvidia/rm_robot/devel/lib/rm_vision_control/arm_controller.py
+Symlinking /home/nvidia/rm_robot/devel/lib/rm_vision_control/main_controller.py
+Symlinking /home/nvidia/rm_robot/devel/lib/rm_vision_control/simplified_main_controller.py
+Symlinking /home/nvidia/rm_robot/devel/lib/rm_vision_control/realsense_processor.py
+Symlinking /home/nvidia/rm_robot/devel/lib/rm_vision_control/point_inspection.py
+Symlinking /home/nvidia/rm_robot/devel/lib/rm_vision_control/crack_detection.py
+Linked: (/home/nvidia/rm_robot/devel/.private/rm_vision_control/lib/python3/dist-packages/rm_vision_control/__init__.py, /home/nvidia/rm_robot/devel/lib/python3/dist-packages/rm_vision_control/__init__.py)
+Linked: (/home/nvidia/rm_robot/devel/.private/rm_vision_control/lib/pkgconfig/rm_vision_control.pc, /home/nvidia/rm_robot/devel/lib/pkgconfig/rm_vision_control.pc)
+Linked: (/home/nvidia/rm_robot/devel/.private/rm_vision_control/share/rm_vision_control/cmake/rm_vision_controlConfig-version.cmake, /home/nvidia/rm_robot/devel/share/rm_vision_control/cmake/rm_vision_controlConfig-version.cmake)
+Linked: (/home/nvidia/rm_robot/devel/.private/rm_vision_control/share/rm_vision_control/cmake/rm_vision_controlConfig.cmake, /home/nvidia/rm_robot/devel/share/rm_vision_control/cmake/rm_vision_controlConfig.cmake)

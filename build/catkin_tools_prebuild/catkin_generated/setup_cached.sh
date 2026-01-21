@@ -13,4 +13,4 @@ export PKG_CONFIG_PATH='/opt/ros/noetic/lib/pkgconfig:/opt/ros/noetic/lib/aarch6
 export PWD='/home/nvidia/rm_robot/build/catkin_tools_prebuild'
 export PYTHONPATH='/opt/ros/noetic/lib/python3/dist-packages'
 export ROSLISP_PACKAGE_DIRECTORIES="/home/nvidia/rm_robot/devel/.private/catkin_tools_prebuild/share/common-lisp:$ROSLISP_PACKAGE_DIRECTORIES"
-export ROS_PACKAGE_PATH='/home/nvidia/rm_robot/build/catkin_tools_prebuild:/home/nvidia/rm_robot/src/rm_msgs:/opt/ros/noetic/share'
+export ROS_PACKAGE_PATH='/home/nvidia/rm_robot/build/catkin_tools_prebuild:/home/nvidia/rm_robot/src/rm_bringup:/home/nvidia/rm_robot/src/rm_msgs:/home/nvidia/rm_robot/src/rm_control:/home/nvidia/rm_robot/src/rm_vision_control:/opt/ros/noetic/share'

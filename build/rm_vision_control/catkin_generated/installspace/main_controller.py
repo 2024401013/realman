@@ -1,0 +1,90 @@
+#!/usr/bin/env python3
+
+# src/rm_vision_control/scripts/main_controller.py
+import rospy
+import signal
+import sys
+import threading  
+from std_msgs.msg import Int32  
+from arm_controller import ArmController
+from vision_detector import VisionDetector
+from crack_detection import CrackDetectionTask
+from point_inspection import PointInspectionTask
+
+class MainController:
+    def __init__(self):
+        rospy.init_node('main_controller', anonymous=True)
+        
+        # 初始化模块
+        rospy.loginfo("Initializing modules...")
+        self.arm_controller = ArmController()
+        self.vision_detector = VisionDetector()
+
+        # 添加小车指令订阅
+        rospy.Subscriber('/is_arrive', Int32, self.car_command_callback)
+        
+        # 初始化任务
+        self.crack_task = CrackDetectionTask(self.arm_controller, self.vision_detector)
+        self.point_task = PointInspectionTask(self.arm_controller, self.vision_detector)
+
+        self.active_task = None  # 'crack' 或 'point'
+        self.task_lock = threading.Lock()
+        
+        # 设置信号处理
+        signal.signal(signal.SIGINT, self.signal_handler)
+        
+        rospy.loginfo("Main Controller initialized successfully")
+        rospy.loginfo("Waiting for car commands...")
+        rospy.loginfo("  is_arrive=1: Start crack detection")
+        rospy.loginfo("  is_arrive=2: Stop crack detection")
+        rospy.loginfo("  is_arrive=3: Start 16-point inspection")
+    
+    def car_command_callback(self, msg):
+        """处理小车指令"""
+        with self.task_lock:
+            if msg.data == 1 and self.active_task is None:
+                rospy.loginfo("Received command: Start crack detection")
+                self.active_task = 'crack'
+                self.arm_controller.set_arm_state(1)
+                
+                # 在新线程中执行任务
+                task_thread = threading.Thread(target=self.crack_task.execute_task)
+                task_thread.start()
+                
+            elif msg.data == 2 and self.active_task == 'crack':
+                rospy.loginfo("Received command: Stop crack detection")
+                self.crack_task.is_active = False
+                self.active_task = None
+                self.arm_controller.set_arm_state(0)
+                
+            elif msg.data == 3 and self.active_task is None:
+                rospy.loginfo("Received command: Start 16-point inspection")
+                self.active_task = 'point'
+                self.arm_controller.set_arm_state(1)
+                
+                # 启动点检测任务
+                task_thread = threading.Thread(target=self.point_task.execute_task)
+                task_thread.start()
+                
+            elif msg.data != 0:
+                rospy.logwarn(f"Unexpected command: {msg.data}, active_task: {self.active_task}")
+
+
+    def signal_handler(self, sig, frame):
+        """处理Ctrl+C信号"""
+        rospy.loginfo("Shutdown signal received")
+        sys.exit(0)
+    
+    def run(self):
+        """运行主控制器"""
+        rospy.spin()
+
+if __name__ == '__main__':
+    try:
+        controller = MainController()
+        controller.run()
+    except rospy.ROSInterruptException:
+        rospy.loginfo("ROS interrupted")
+    except Exception as e:
+        rospy.logerr(f"Error in main controller: {e}")
+

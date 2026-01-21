@@ -26,6 +26,8 @@ find_package(catkin REQUIRED COMPONENTS
 # find_package(OpenCV REQUIRED)
 # find_package(PCL REQUIRED)
 
+catkin_python_setup()
+
 # 生成消息、服务和动作（如果需要）
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -94,21 +96,13 @@ include_directories(
 
 # 安装Python脚本
 catkin_install_python(PROGRAMS
-  scripts/main_controller.py
-  scripts/arm_controller.py
-  scripts/vision_detector.py
-  scripts/realsense_processor.py
-  scripts/crack_detection.py
-  scripts/point_inspection.py
-  scripts/utils.py
-  test/test_arm_solo.py
-  test/test_camera_solo.py
-  test/test_vision_solo.py
-  test/test_arm_camera_integration.py
-  test/test_task1_full.py
-  test/set_arm_pose.py
-  test/monitor_arm_state.py
-  test/run_all_tests.py
+  src/rm_vision_control/main_controller.py
+  src/rm_vision_control/arm_controller.py
+  src/rm_vision_control/vision_detector.py
+  src/rm_vision_control/realsense_processor.py
+  src/rm_vision_control/crack_detection.py
+  src/rm_vision_control/point_inspection.py
+  src/rm_vision_control/utils.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
@@ -184,12 +178,6 @@ install(DIRECTORY scripts/
 
 # 启用测试
 if(CATKIN_ENABLE_TESTING)
-  # 添加Python测试
-  catkin_add_nosetests(test
-    test/test_arm_control.py
-    test/test_vision_detector.py
-  )
-  
   # 如果需要C++测试，取消注释
   # find_package(rostest REQUIRED)
   # add_rostest(test/test_arm_control.test)

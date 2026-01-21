@@ -1,0 +1,1 @@
+/home/nvidia/rm_robot/devel/.private/rm_vision_control/lib/python3/dist-packages/rm_vision_control/__init__.py

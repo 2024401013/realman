@@ -18,12 +18,11 @@ class PointInspectionTask:
         self.grid_size = 0.05  # 5cm网格间距
         self.rows = 4
         self.cols = 4
-        self.safety_distance = 0.05  # 5cm安全距离
-        self.approach_distance = 0.1  # 前进5cm
-        self.approach_speed = 0.1     # 缓慢速度
+        self.safety_distance = 0.45  # 5cm安全距离
+        self.approach_distance = 0.1  # 前进10cm
+        self.approach_speed = 0.05     # 缓慢速度
         
         rospy.loginfo("PointInspectionTask initialized")
-    
     
     def execute_task(self):
         """执行16点检测任务"""
@@ -31,39 +30,25 @@ class PointInspectionTask:
             # 停止小车
             self.arm.set_car_speed(0.0)
             rospy.loginfo("Car stopped")
-
+            
             # 移动到观测位置
             if not self.arm.move_to_pose_jp(self.arm.detect_pose, speed=0.2):
                 rospy.logerr("Failed to move to detect pose")
                 return
             
-            # 识别目标并计算16个点
-            rospy.loginfo("Detecting target...")
-            # target_center = self.vision.detect_target()
-            target_center = {
-                'center_2d': (653, 402), 
-                'center_3d_robot': [-0.335, 0.012, 0.452],  
-                'center_3d_camera': [0.615, 0.002, 0.382], 
-                'confidence': 0.87,
-                'depth_mm': 615.4,
-                'depth_m': 0.6154,
-                'bbox': [593, 352, 713, 452], 
-                'detections': [{
-                    'bbox': [593, 352, 713, 452],
-                    'center': (653, 402),
-                    'confidence': 0.87,
-                    'class_id': 0,
-                    'class_name': 'target'
-                }],
-                'annotated_image': None,
-                'timestamp': rospy.Time.now().to_sec(),
-                'pose_quality': 0.92,
-                'inliers_count': 128,
-                'reprojection_error': 1.2
-            }
+            rospy.loginfo("Detecting target for up to 10 seconds...")
+            start_time = rospy.Time.now()
+            target_center = None
+            while (rospy.Time.now() - start_time) < rospy.Duration(10.0) and target_center is None:
+                target_center = self.vision.detect_target()
+                if target_center is None:
+                    rospy.loginfo("Target not detected yet, retrying...")
+                    rospy.sleep(0.5)  
             
             if target_center is None:
-                rospy.logwarn("Target not detected, task failed")
+                rospy.logwarn("Target not detected after 10 seconds, task failed")
+                rospy.loginfo("Returning to home position due to detection failure")
+                self.arm.go_home()
                 self.is_active = False
                 return
             
@@ -71,7 +56,7 @@ class PointInspectionTask:
             
             # 计算16个点的坐标
             points = self.vision.calculate_16_points(
-                target_center['center_3d_robot'], 
+                target_center['center_3d_robot'],
                 grid_size=self.grid_size,
                 rows=self.rows,
                 cols=self.cols
@@ -86,17 +71,33 @@ class PointInspectionTask:
             rospy.loginfo("Returning to home position")
             self.arm.go_home()
             
-            # 恢复小车速度
-            self.arm.set_car_speed(0.8)
-            rospy.loginfo("Car speed set to 0.8")
-            
             rospy.loginfo("16-point inspection task completed successfully")
             
         except Exception as e:
             rospy.logerr(f"Error in 16-point inspection task: {e}")
         finally:
+            # ⚠️ 关键修改：确保任务真正完成后再设置 is_active=False
+            rospy.loginfo("Ensuring arm returns to home position...")
+            
+            # 等待机械臂开始回家
+            rospy.sleep(0.5)
+            
+            # 尝试回家，最多3次
+            for retry in range(3):
+                rospy.loginfo(f"Attempting to go home (attempt {retry+1}/3)...")
+                if self.arm.go_home():
+                    rospy.loginfo("✅ Go home command sent successfully")
+                    break
+                rospy.sleep(1.0)
+            
+            # ⚠️ 重要：等待一段时间确保机械臂开始移动
+            rospy.sleep(1.0)
+            
+            # 设置任务为非活跃状态
             self.is_active = False
-    
+            rospy.loginfo("Point inspection task thread completed - is_active=False") 
+
+
     def execute_point_inspection(self, points):
         """执行点检测"""
         if len(points) != self.rows * self.cols:
@@ -150,8 +151,7 @@ class PointInspectionTask:
         pose.position.y = point[1]
         pose.position.z = point[2]
         
-        # 关键：减去安全距离5cm
-        # Z轴向上，墙在下方，所以减去安全距离
+        # 关键：减去安全距离
         pose.position.x = point[0] + self.safety_distance
         
         # 保持水平姿态

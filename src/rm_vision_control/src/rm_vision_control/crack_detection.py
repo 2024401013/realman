@@ -13,22 +13,21 @@ class CrackDetectionTask:
         # 任务状态
         self.is_active = False
         self.last_detection_time = 0
-        self.detection_interval = 5.0  # 4秒间隔
+        self.detection_interval = 8.0  # 8秒间隔
         
         rospy.loginfo("CrackDetectionTask initialized")
-    
-    
+
     def execute_task(self):
         """执行裂缝检测任务"""
-        if self.is_active:  # 防止重复执行
+        if self.is_active:
             return
-
+        
         self.is_active = True
         try:
             # 发布小车缓慢速度
             self.arm.set_car_speed(0.3)
             rospy.loginfo("Car speed set to 0.3")
-
+            
             # 移动到观测姿态pose1
             rospy.loginfo("Moving to pose1")
             if not self.arm.move_to_pose_jp(self.arm.pose1, speed=0.3):
@@ -38,19 +37,17 @@ class CrackDetectionTask:
             # 开始往返运动
             self.execute_reciprocating_motion()
             
-            # 任务完成，回到初始位置
-            rospy.loginfo("Task completed, returning home")
-            self.arm.go_home()
-
-            # 发布小车正常速度
-            self.arm.set_car_speed(0.8)
-            rospy.loginfo("Car speed set to 0.8")
-            
         except Exception as e:
             rospy.logerr(f"Error in crack detection task: {e}")
         finally:
+            # 关键：确保回到home
+            rospy.loginfo("Task completed or stopped, returning home")
+            self.arm.go_home()
+            
+            # 设置任务为非活跃状态
             self.is_active = False
-    
+            rospy.loginfo("Crack detection task thread completed")
+
     def execute_reciprocating_motion(self):
         """在pose1和pose2之间直线往返运动"""
         move_to_pose1 = True
@@ -64,7 +61,7 @@ class CrackDetectionTask:
                 rospy.loginfo("Moving to pose2")
                 target_pose = self.arm.pose2
             
-            if not self.arm.move_to_pose_jp(target_pose, speed=0.1):
+            if not self.arm.move_to_pose_jp(target_pose, speed=0.03):
                 rospy.logerr("Failed to move to target pose")
                 break
             

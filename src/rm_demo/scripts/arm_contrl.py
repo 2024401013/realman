@@ -73,7 +73,7 @@ if __name__ == '__main__':
         # --- 方式二：使用四元数（精确，直接透传） ---
         q_data = [0.0, -0.707, 0.0, 0.707]
         # q_data = [0.0, 0.0, 1.0, 0.0]
-        controller.move_arm(-0.335, -0.06300000000000001, 0.527, q_data, input_type="quaternion")
+        controller.move_arm(0.15, 0, 0.45, q_data, input_type="quaternion")
 
     except rospy.ROSInterruptException:
         pass

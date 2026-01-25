@@ -39,7 +39,7 @@ class VisionDetector:
         self.depth_max_threshold = 8000
         
         # ==== 相机到机械臂末端的固定偏移 ====
-        self.camera_to_link6_trans = np.array([0.075, 0.0, -0.028])
+        self.camera_to_link6_trans = np.array([-0.075, 0.0, -0.038])
         self.camera_to_link6_rot = np.array([0.0, 0.0, 0.0, 1.0])  # 四元数（无旋转）
         
         # ==== TF监听器 ====
@@ -196,50 +196,59 @@ class VisionDetector:
         return np.array([x, y, z])
     
     def transform_to_robot(self, point_camera):
-        """
-        将相机坐标系点转换到机械臂基座坐标系
-        步骤：相机系 → link6系（硬编码偏移） → base_link系（实时TF）
-        """
         if point_camera is None:
+            rospy.logwarn("point_camera is None")
             return None
         
         try:
-            # 1. 获取link6在base_link下的实时位姿
-            (link6_trans, link6_rot) = self.tf_listener.lookupTransform(
-                "base_link", "Link6", rospy.Time(0)
-            )
+            # 使用最新可用时间戳
+            time = rospy.Time(0)
             
-            # 2. 构建「相机→link6」的变换矩阵
+            # 关键诊断1：打印 link6 当前在 base_link 的真实位置
+            (link6_trans, link6_rot) = self.tf_listener.lookupTransform(
+                "base_link", "Link6", time
+            )
+            rospy.loginfo("=== TF 诊断 ===")
+            rospy.loginfo(f"Link6 在 base_link 的位置: X={link6_trans[0]:.3f} m, Y={link6_trans[1]:.3f} m, Z={link6_trans[2]:.3f} m")
+            rospy.loginfo(f"Link6 旋转四元数: {link6_rot}")
+            
+            # 打印相机到 link6 的固定偏移（确认是否正确）
+            rospy.loginfo(f"相机到 link6 固定偏移: {self.camera_to_link6_trans}")
+            
+            # 相機 → Link6 變換矩陣
             camera_to_link6_mat = self.tf_listener.fromTranslationRotation(
                 self.camera_to_link6_trans, self.camera_to_link6_rot
             )
             
-            # 3. 相机系点转齐次坐标
+            # 相機坐標 → Link6 坐標
             point_camera_h = np.append(point_camera, 1)
-            
-            # 4. 转换到link6系
             point_link6_h = np.dot(camera_to_link6_mat, point_camera_h)
             point_link6 = point_link6_h[:3]
+            rospy.loginfo(f"点在 link6 坐标系: X={point_link6[0]:.3f}, Y={point_link6[1]:.3f}, Z={point_link6[2]:.3f}")
             
-            # 5. 构建「link6→base_link」的变换矩阵
+            # Link6 → base_link 變換矩陣
             link6_to_base_mat = self.tf_listener.fromTranslationRotation(link6_trans, link6_rot)
             
-            # 6. link6系点转齐次坐标
+            # Link6 坐標 → base_link 坐標
             point_link6_h = np.append(point_link6, 1)
-            
-            # 7. 转换到base_link系（机械臂基座坐标系）
             point_base_h = np.dot(link6_to_base_mat, point_link6_h)
             point_base = point_base_h[:3]
+            
+            # 最终输出 + 诊断总结
+            rospy.loginfo(f"最终点在 base_link: X={point_base[0]:.3f}, Y={point_base[1]:.3f}, Z={point_base[2]:.3f}")
+            rospy.loginfo(f"相機深度 Z={point_camera[2]:.3f} m → base_link Z={point_base[2]:.3f} m")
+            rospy.loginfo(f"Z 差值: {point_base[2] - point_camera[2]:.3f} m (应该接近 link6 的 Z 或偏移)")
+            rospy.loginfo("=== 诊断结束 ===\n")
             
             return point_base
         
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as e:
-            rospy.logwarn(f"TF transform error: {e}")
+            rospy.logwarn_throttle(5.0, f"TF transform error (throttled): {e}")
             return None
         except Exception as e:
             rospy.logerr(f"Unexpected error in transform_to_robot: {e}")
             return None
-
+            sss
     def detect_cracks(self):
         """检测裂缝"""
         if self.color_image is None or self.crack_model is None:

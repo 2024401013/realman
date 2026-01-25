@@ -141,11 +141,14 @@ class ArmController:
         
         return self.wait_for_completion()
     
-    def set_car_speed(self, speed):
-        """控制小车速度"""
-        speed_msg = Float32()
-        speed_msg.data = speed
-        self.car_speed_pub.publish(speed_msg)
+    def set_car_speed(self, speed, publish_times=5):
+        """控制小車速度，可指定發布次數"""
+        for i in range(publish_times):
+            speed_msg = Float32()
+            speed_msg.data = speed
+            self.car_speed_pub.publish(speed_msg)
+            if i < publish_times - 1:  # 如果不是最後一次，短暫等待
+                rospy.sleep(0.5)      # 10ms 間隔，避免堆積
     
     def euler_to_quaternion(self, roll, pitch, yaw):
         """欧拉角转四元数"""

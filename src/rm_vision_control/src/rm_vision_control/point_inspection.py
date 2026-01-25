@@ -18,10 +18,18 @@ class PointInspectionTask:
         self.grid_size = 0.05  # 5cm网格间距
         self.rows = 4
         self.cols = 4
-        self.safety_distance = 0.45  # 5cm安全距离
-        self.approach_distance = 0.1  # 前进10cm
+        self.safety_distance = 0.4  # 5cm安全距离
+        self.approach_distance = 0.085  # 前进10cm
         self.approach_speed = 0.05     # 缓慢速度 
         self.current_count = 0
+
+        self.x_offset = 0
+        self.y_offset = 0.165
+        self.z_offset = -0.02
+
+        self.stable_frames_required = 10      # 需要连续稳定多少帧
+        self.stable_threshold = 0.05       # XYZ 最大变化阈值（米）
+        self.center_history = []             # 存储连续帧的 center_3d_robot（list of [x,y,z]）
         
         rospy.loginfo("PointInspectionTask initialized")
 
@@ -31,85 +39,127 @@ class PointInspectionTask:
             # 停止小車
             self.arm.set_car_speed(0.0)
             rospy.loginfo("Car stopped")
-          
+         
             # 移動到观测位置
             if not self.arm.move_to_pose_jp(self.arm.detect_pose, speed=0.2):
                 rospy.logerr("Failed to move to detect pose")
                 return
-          
+         
             rospy.loginfo("Detecting target for up to 10 seconds...")
             start_time = rospy.Time.now()
             target_center = None
+            self.center_history = []  # 清空历史记录
+            
             while (rospy.Time.now() - start_time) < rospy.Duration(10.0) and target_center is None:
-                target_center = self.vision.detect_target()
-                if target_center is None:
+                current_target = self.vision.detect_target()
+                if current_target is None:
                     rospy.loginfo("Target not detected yet, retrying...")
-                    rospy.sleep(0.5)
-          
+                    rospy.sleep(0.2)  # 缩短间隔，提高检测频率
+                    continue
+                
+                center_robot = current_target['center_3d_robot']
+                if center_robot is None:
+                    rospy.loginfo("No valid 3D robot center, retrying...")
+                    rospy.sleep(0.2)
+                    continue
+                
+                # 添加当前帧到历史
+                self.center_history.append(center_robot)
+                
+                # 如果收集到足够帧数，开始检查稳定性
+                if len(self.center_history) >= self.stable_frames_required:
+                    is_stable = True
+                    max_diff = 0.0
+                    
+                    # 检查最后 N 帧中相邻帧的最大变化
+                    for i in range(1, self.stable_frames_required):
+                        prev = np.array(self.center_history[-i-1])
+                        curr = np.array(self.center_history[-i])
+                        diff = np.linalg.norm(prev - curr)  # 欧氏距离
+                        max_diff = max(max_diff, diff)
+                        if diff > self.stable_threshold:
+                            is_stable = False
+                            break
+                    
+                    rospy.loginfo(f"当前稳定检查：最大变化 = {max_diff:.4f} m")
+                    
+                    if is_stable:
+                        # 稳定！取最后 N 帧平均值作为最终中心
+                        stable_center = np.mean(self.center_history[-self.stable_frames_required:], axis=0)
+                        target_center = current_target.copy()
+                        target_center['center_3d_robot'] = stable_center.tolist()
+                        
+                        rospy.loginfo(f"目标稳定！连续 {self.stable_frames_required} 帧，最大变化 {max_diff:.4f}m < {self.stable_threshold}m")
+                        rospy.loginfo(f"稳定中心点: {stable_center}")
+                        break
+                    else:
+                        rospy.loginfo(f"目标不稳定，继续检测...")
+                
+                rospy.sleep(0.2)  # 每帧间隔
+            
             if target_center is None:
-                rospy.logwarn("Target not detected after 10 seconds, task failed")
+                rospy.logwarn("Target not detected or not stable after 10 seconds, task failed")
                 rospy.loginfo("Returning to home position due to detection failure")
                 self.arm.go_home()
                
-                # 失敗也要恢復狀態
                 self.arm.set_car_speed(0.8)
                 rospy.loginfo("Failed detection → car speed restored to 0.8")
                
                 self.is_active = False
-                # 新增：即使失敗也要通知主控制器任務結束
                 self._publish_task_done("failed")
                 return
-          
-            rospy.loginfo(f"Target center detected at: {target_center}")
-          
-            # 計算16個點的坐標
+            
+            # 应用偏移（在稳定中心上）
+            center_robot = target_center['center_3d_robot']
+            center_robot[0] += self.x_offset  # x
+            center_robot[1] += self.y_offset  # y
+            center_robot[2] += self.z_offset  # z
+            
+            rospy.loginfo(f"Target center detected at (after offset): {target_center}")
+         
+            # 计算16个点的坐标
             points = self.vision.calculate_16_points(
-                target_center['center_3d_robot'],
+                center_robot,
                 grid_size=self.grid_size,
                 rows=self.rows,
                 cols=self.cols
             )
-          
+         
             rospy.loginfo(f"Calculated {len(points)} points")
-          
-            # 執行16點檢測
+         
+            # 执行16点检测
             self.execute_point_inspection(points)
-          
+         
             # 回到初始位置
             rospy.loginfo("Returning to home position")
             self.arm.go_home()
-          
+         
             rospy.loginfo("16-point inspection task completed successfully")
-          
-            # 成功結束也要通知
+         
+            # 成功结束也要通知
             self._publish_task_done("completed")
-          
+         
         except Exception as e:
             rospy.logerr(f"Error in 16-point inspection task: {e}")
-            # 異常也要通知
             self._publish_task_done("error")
        
         finally:
             rospy.loginfo("Point task cleanup: ensuring return to home and restore car speed")
-          
+         
             self.arm.go_home()
-          
-            # 等待回家
+         
             if self.arm.wait_until_home(timeout=60.0):
                 rospy.loginfo("Arm reached home during cleanup")
             else:
                 rospy.logwarn("Home timeout in cleanup, proceeding anyway")
-          
+         
             self.arm.set_car_speed(0.8)
-            rospy.loginfo("Point task cleanup: car speed restored to 0.8 (after arm_state)")
-          
+            rospy.loginfo("Point task cleanup: car speed restored to 0.8")
+         
             self.is_active = False
             rospy.loginfo("Point inspection task thread completed - is_active=False")
-            
-            # 最後保險：無論如何都發送結束信號
+           
             self._publish_task_done("finally")
-
-    # 新增一個私有方法，統一發布結束信號
     def _publish_task_done(self, status="done"):
         from std_msgs.msg import String
         try:
@@ -145,15 +195,13 @@ class PointInspectionTask:
             approach_pose = self.create_pose_from_point(points[point_idx])
             approach_pose.position.x -= self.approach_distance  # 假设z轴指向墙面
             
-            if not self.arm.move_to_pose_jp(approach_pose, speed=self.approach_speed):
+            if not self.arm.move_to_pose_line(approach_pose, speed=self.approach_speed):
                 rospy.logwarn(f"Failed to approach point {i+1}")
-            
-            # 在这里可以添加实际的检测操作
-            # self.perform_point_test()
+
             
             # 退回到原位
             rospy.loginfo(f"Retracting from point {i+1}")
-            if not self.arm.move_to_pose_jp(target_pose, speed=self.approach_speed):
+            if not self.arm.move_to_pose_line(target_pose, speed=self.approach_speed):
                 rospy.logwarn(f"Failed to retract from point {i+1}")
             
             # 短暂停顿
